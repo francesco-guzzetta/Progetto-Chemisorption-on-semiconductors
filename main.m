@@ -23,7 +23,7 @@ ni = 1.45e16;        %si [m-3]
 
 %% Dati del problema 
 a=200e-9;                        %[m] larghezza della buca
-autovalori=1;                    %[/] numero autovalori
+autovalori=30;                    %[/] numero autovalori
 dx=1.e-11;                       %[m] passo discretizzazione
 x = linspace(-a/2,a/2, a/dx)';   %[m] asse x       
 
@@ -37,20 +37,19 @@ N = length(V);
 
 [En, psi] = Schrodinger_1D(dx, V, autovalori, m0, h, N, x);
 
+%% calcolo nx
 
-%% autovalori esatti
+[nx, nx_tot] = calcolo_nx(En, psi, kb, T, autovalori, Eg);
+
+nx_tot
+
+
+%% errore
+% autovalori esatti
 En_esatti = zeros(autovalori, 1);
 for i = 1:autovalori
     En_esatti(i)  = (i^2*(h^2))/(8*m0*(a^2));
 end
-
-
-%% calcolo nx
-
-[nx, nx_tot] = calcolo_nx(En, psi, kb, T, autovalori, Ec, Nc);
-
-
-%% errore
 
 %ritrasformiamo in elettron-volt per maggiore chiarezza 
 
