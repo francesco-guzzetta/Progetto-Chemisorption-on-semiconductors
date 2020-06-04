@@ -5,29 +5,27 @@ close all
 %% MAIN
 
 %Costanti
-q  = 1.602176e-19;  % [C]           carica elettrone
-m0 = 9.1095e-31;    % [Kg]          massa elettrone 
-h  = 6.6261e-34;    % [J s]         costante di plank 
-kb = 1.380645e-23;  % [J K^-1]      costante di boltzman T temperatoura in kelvin
-T = 300;            % [k]
-ht = h/(2*pi);      % [J s]         costante di plank (tagliata)
-mn = 9.11e-31;      % [m]           massa efficace elettrone
-Nd = 1e22;          % [m^-3]        concentrazione di drogaggio in un m^3
-e0 = 8.85e-12;      % [F m^-1]      epsilon zero
-er = 5.4;           % [/]           epsilon r
-Eg = 1.1082*q;      % [J]
-Eg_1D = 3.8773e-19;
-Nc = 2.82e25;       % [m-3]
-Nv = 1.04e25;       % [m-3]
-Ec = Eg/2 + kb*T*log(sqrt(Nc/Nv)); %[J]
-ni = 1.45e16;       %si [m-3]
+q  = 1.60217662e-19;    % [C]           carica elettrone
+mh = 1.6398e-31;        % [Kg]          massa elettrone 
+h  = 6.6261e-34;        % [J s]         costante di plank 
+kb = 1.38064852e-23;    % [J K^-1]      costante di boltzman 
+T = 300;                % [k]           T temperatoura in kelvin
+ht = 1.0545718e-34;     % [J s]         costante di plank (tagliata)
+m = 9.9359e-31;         % [m]           massa efficace elettrone
+Nd = 1e22;              % [m^-3]        concentrazione di drogaggio in un m^3
+e0 = 8.85e-12;          % [F m^-1]      epsilon zero
+er = 5.4;               % [/]           epsilon r
+Eg = 1.1082*q;          % [J]
+Nc = sqrt (((m*kb*T/(ht^2*pi))^3) / 2);         % [m-3]
+Nv = sqrt (((mh*kb*T/(ht^2*pi))^3) / 2);        % [m-3]
+ni = 1.45*10^16;                                % [m-3]
+
 
 %% Se NON drogato
-Ef = Eg/2 + 0.5*kb*T*log(Nc/Nv);
+Ef0 = Eg/2 + kb*T*log(sqrt(Nc/Nv)); %[J]   %si [m-3]
 
 %% Se Drogato
-%Ef = Eg/2 - kb*T*log(Nd/(1.45*10^16));
-
+%Ef = Eg/2 - kb*T*log(Nd/(ni));
 
 %% Variazione buca
 
@@ -36,36 +34,49 @@ buca = logspace(-9, -7, 20);
 
 for i = 1 : numel(buca) 
 a = buca(i);                     %[m] larghezza della buca                               
-autovalori=100;                  %[/] numero autovalori
 dx=3.e-12;                       %[m] passo discretizzazione
 x = linspace(-a/2,a/2, a/dx)';   %[m] asse x   
 V = zeros(size(x));              %[V] vettore potenziale
 N = length(V);
+autovalori = 100;
+Ef = Ef0;
 
-[nq(i), ni(i)] = calc_nq(Eg, kb, T, Nc, Nv, a, dx, V, autovalori, m0, h, N, x, Ef );
+% En esatti
+[En] = En_esatti(autovalori, m, a, ht);
 
+%En schrodinger
+%[En, psi] = Schrodinger_1D(dx, V, autovalori, m, h, N, x);
+
+[nq(i), ni(i)] = calc_nq(Eg, kb, T, Nc, Nv, a, Ef, En);
 end 
 
 figure
-loglog(buca, nq, buca, ni)
+loglog(buca, nq,'LineWidth',3)
+hold on
+loglog(buca, ni,'LineWidth',3)
 
 %% Variazioni di Ef
 
 %valori buca
 a = 80e-9;                      %[m] larghezza della buca                                 
-autovalori=100;                 %[/] numero autovalori
 dx=3.e-12;                      %[m] passo discretizzazione
 x = linspace(-a/2,a/2, a/dx)';  %[m] asse x   
-V = zeros(size(x)); %[V] vettore potenziale
+V = zeros(size(x));             %[V] vettore potenziale
 N = length(V);
 
-Ef0 = linspace(Ef, 0, 10);   
+Efrange = linspace(Ef0, 0, 10);   
 
 %Codice
-for j = 1 : numel(Ef0) 
-   
-Ef = Ef0(j)
-[n1(j), n2(j)] = calc_nq(Eg, kb, T, Nc, Nv, a, dx, V, autovalori, m0, h, N, x, Ef);
+for j = 1 : numel(Efrange)    
+autovalori = 100;
+Ef = Efrange(j);
+%En esatti
+[En] = En_esatti(autovalori, m, a, ht);
+
+%En schrodinger
+%[En, psi] = Schrodinger_1D(dx, V, autovalori, m, h, N, x);
+
+[n1(j), n2(j)] = calc_nq(Eg, kb, T, Nc, Nv, a, Ef, En);
 end 
 
 figure
@@ -74,23 +85,31 @@ hold on
 semilogy(n2,'LineWidth',3)
 
 
-
 %% calcolo nq
 
-function [nq, ni] = calc_nq(Eg, kb, T, Nc, Nv, a, dx, V, autovalori, m0, h, N, x, Ef )
 
-[En1, psi] = Schrodinger_1D(dx, V, autovalori, m0, h, N, x);
+function [nq, ni] = calc_nq(Eg, kb, T, Nc, Nv, a, Ef, En )
 
-[ex, ey, ez] = meshgrid (En1);
+[ex, ey, ez] = meshgrid (En);
 e3d  = (ex + ey + ez);
 e3d  = e3d(:);
 
 f  = 2 * exp (- (e3d + Ef) / (kb * T));
-
 nq = sum (f) / a^3;
   
 if (nargout > 1)
-ni = sqrt (Nc * Nv) * exp (-(Eg/2)/(kb*T));
+ni = sqrt(Nc * Nv) * exp (-(Eg/2)/(kb*T));
 end
 
+end
+
+
+%% calcolo autovalori
+
+function [En_esatti] = En_esatti(autovalori, m, a,ht)
+%% autovalori esatti
+En_esatti = zeros(autovalori, 1);
+for i = 1:autovalori
+    En_esatti(i)  = (ht^2/(2*m))*((pi*i)/a)^2;
+end
 end
