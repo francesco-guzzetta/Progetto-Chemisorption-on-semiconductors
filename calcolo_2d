@@ -21,7 +21,7 @@ ni = 1.45*10^16;                                % [m-3]
 
 
 %% Se NON drogato
-Ef = Eg/2; %[J]   %si [m-3]
+Ef = Eg/2+kb*T*log(sqrt(Nc/Nv)); %[J]   %si [m-3]
  
 %% Dati del problema 
 autovalori=100;                   %[/] numero autovalori 
