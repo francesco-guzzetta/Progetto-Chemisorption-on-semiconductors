@@ -26,12 +26,16 @@ Ef = Eg/2+kb*T*log(sqrt(Nc/Nv)); %[J]   %si [m-3]
 %% Dati del problema 
 autovalori=100;                   %[/] numero autovalori 
 
-buca = logspace(-9, -6, 20);
+%% Dati del problema 
+autovalori=100;                   %[/] numero autovalori 
+
+buca = logspace(-9, -7, 20);
 for j = 1 : numel(buca) 
 a = buca(j);                     %[m] larghezza della buca 
 
 [qn(j)] = calcolo_2(Eg, kb, T, a,autovalori, m, h,Ef, ht);
 end
+qn
 semilogy(qn,'LineWidth',3)
 
 function [qn] = calcolo_2(Eg, kb, T, a,autovalori, m, h,Ef, ht)
@@ -41,14 +45,13 @@ En_esatti = zeros(autovalori, 1);
 for i = 1:autovalori
     En_esatti(i)  = (i^2*(h^2))/(8*m*(a^2));
 end
-
+fun = 0;
 q1=zeros(1,autovalori);
 for i = 1:autovalori  
-Ei = linspace(En_esatti(i), 20*Eg, 32768);
-f =  2*exp(-(Ei+Ef)./(kb*T)); 
+Ei = En_esatti(i);
+f =  kb*T*exp(-(Ei+Ef)./(kb*T));
 g2d = m/(pi*ht^2);
-fun = g2d.*f;
-q1(i) = trapz(Ei,fun);
+fun = fun + g2d.*f;
 end
-qn=sum(q1);
+qn=fun/a^2;
 end
