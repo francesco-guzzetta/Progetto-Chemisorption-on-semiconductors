@@ -36,7 +36,7 @@ a = buca(j);                     %[m] larghezza della buca
 [qn(j)] = calcolo_2(Eg, kb, T, a,autovalori, m, h,Ef, ht);
 end
 qn
-semilogy(qn,'LineWidth',3)
+loglog(buca,qn,'LineWidth',3)
 
 function [qn] = calcolo_2(Eg, kb, T, a,autovalori, m, h,Ef, ht)
 
