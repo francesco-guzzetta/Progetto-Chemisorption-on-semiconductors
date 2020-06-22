@@ -53,5 +53,5 @@ f =  kb*T*exp(-(Ei+Ef)./(kb*T));
 g2d = m/(pi*ht^2);
 fun = fun + g2d.*f;
 end
-qn=fun/a^2;
+qn=fun/a;
 end
