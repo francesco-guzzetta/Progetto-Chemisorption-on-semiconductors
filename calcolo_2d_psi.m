@@ -24,34 +24,38 @@ ni = 1.45*10^16;                                % [m-3]
 Ef = Eg/2+kb*T*log(sqrt(Nc/Nv)); %[J]   %si [m-3]
  
 %% Dati del problema 
-autovalori=100;                   %[/] numero autovalori 
-
-%% Dati del problema 
-autovalori=100;                   %[/] numero autovalori 
-
-buca = logspace(-9, -7, 20);
-for j = 1 : numel(buca) 
-a = buca(j);                     %[m] larghezza della buca 
-
-[qn(j)] = calcolo_2(Eg, kb, T, a,autovalori, m, h,Ef, ht);
-end
-qn
-loglog(buca,qn,'LineWidth',3)
-
-function [qn] = calcolo_2(Eg, kb, T, a,autovalori, m, h,Ef, ht)
+autovalori=20;                   %[/] numero autovalori
+a = 1e-9;                     %[m] larghezza della buca 
+x = linspace(0,a, 1024)';
+[qn, fun] = calcolo_2( Eg, kb, T, a, autovalori, m, h,Ef, ht, x);
+figure 
+plot(qn)
+function [qn, fun] = calcolo_2(Eg, kb, T, a,autovalori, m, h,Ef, ht,x)
 
 % autovalori esatti
 En_esatti = zeros(autovalori, 1);
 for i = 1:autovalori
     En_esatti(i)  = (i^2*(h^2))/(8*m*(a^2));
+    psi(i,:) = sqrt(2/a)*sin((i*pi*x)/a);
 end
-fun = 0;
-q1=zeros(1,autovalori);
+
+fun = zeros(autovalori,numel(x));
+f = zeros(autovalori,numel(x));
+qn = zeros(1,numel(x));
 for i = 1:autovalori  
 Ei = En_esatti(i);
-f =  kb*T*exp(-(Ei+Ef)./(kb*T));
+exp(-(Ei+Ef)/(kb*T))
+f(i,:) = kb*T*exp(-(Ei+Ef)./(kb*T)).*(abs(psi(i,:)).^2);
 g2d = m/(pi*ht^2);
-fun = fun + g2d.*f;
+fun(i,:) = f(i,:).*g2d;
 end
-qn=fun/a;
+figure
+plot(x,fun)
+
+for i = 1:autovalori
+    qn = qn + fun(i,:);
 end
+end
+
+
+
