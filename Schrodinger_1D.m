@@ -28,8 +28,5 @@ En = En(1:autovalori);
 psi_completa = F(:,kk);       %ordina le colonne della matrice F in base
                               %al vettore di ordinamento kk
 
-psi = sqrt(1/dx)*psi_completa(:,1:autovalori); %si prendono della matrice psi_completa solo 
+psi = sqrt(1/dx)*psi_completa(:,1:autovalori)'; %si prendono della matrice psi_completa solo 
                                     %le "autofunzioni" richieste(dal valore autovalori)
-                                    
-
-
