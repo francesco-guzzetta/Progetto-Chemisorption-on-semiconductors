@@ -19,13 +19,13 @@ Eg = 1.1082*q;          % [J]
 Nc = sqrt (((m*kb*T/(ht^2*pi))^3) / 2);         % [m-3]
 Nv = sqrt (((mh*kb*T/(ht^2*pi))^3) / 2);        % [m-3]
 
-ni = sqrt(Nc * Nv) * exp (-(Eg/2)/(kb*T));
+ni = sqrt(Nc * Nv) * exp (-(Eg/2)/(kb*T))
 
 Ef0 = Eg/2+kb*T*log(sqrt(Nc/Nv)); %[J]   %si [m-3]
 
 % dati buca 
 
-buca = 1e-8;
+buca = 1e-8
 for i = 1 : numel(buca)
 a = buca(i);                     %[m] larghezza della buca                               
 dx=1.e-11;                       %[m] passo discretizzazione
@@ -40,7 +40,7 @@ for j = 1:4
 %[En, psi] = En_esatti(autovalori, m, a, h, x);
 
 %En schrodinger
-[En, psi] = Schrodinger_1D(dx, V, autovalori, m, h, N, x, a);
+[En, psi] = Schrodinger_1D(dx, V, autovalori, m, h, N, x);
 
 [qn, fun] = calcolo_2(Eg, kb, T, a,autovalori, m,Ef, ht, x, En ,psi);
 
@@ -55,6 +55,8 @@ plot([0 1],[ni ni])
 end
 
 end 
+
+
 
 function [V] = Poisson_1d(N, dx, ni, q, e0, er, qn, psi, V)
 
