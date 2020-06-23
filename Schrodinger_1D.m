@@ -5,7 +5,7 @@ function [En, psi] = Schrodinger_1D(dx, V, autovalori, m0, h, N, x)
 
 %% Matrice H
 e = ones(N,1);
-H = -(h/2/pi/dx)^2/2/m0*spdiags([1*e -2*e 1*e],-1:1, N, N);
+H = -(h/2/pi/dx)^2/2/m0*spdiags([1*e -(2*e+V) 1*e],-1:1, N, N);
 
 %condizione al contorno 
 H(1,1)=1;
@@ -28,7 +28,7 @@ En = En(1:autovalori);
 psi_completa = F(:,kk);       %ordina le colonne della matrice F in base
                               %al vettore di ordinamento kk
 
-psi = psi_completa(:,1:autovalori); %si prendono della matrice psi_completa solo 
+psi = sqrt(1/dx)*psi_completa(:,1:autovalori); %si prendono della matrice psi_completa solo 
                                     %le "autofunzioni" richieste(dal valore autovalori)
                                     
 
