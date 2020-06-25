@@ -25,33 +25,26 @@ Ef0 = Eg/2+kb*T*log(sqrt(Nc/Nv)); %[J]   %si [m-3]
 
 % dati buca 
 
-buca = 1e-8
+%buca = logspace(-9, -7, 5);
+buca = 1e-8;
 for i = 1 : numel(buca)
 a = buca(i);                     %[m] larghezza della buca                               
-dx=1.e-11;                       %[m] passo discretizzazione
-x = linspace(0,a, a/dx)';   %[m] asse x   
+dx=5.e-12;                       %[m] passo discretizzazione
+x = linspace(0,a, a/dx)';        %[m] asse x   
 V = zeros(size(x));              %[V] vettore potenziale
 N = length(V);
 autovalori = 100;
 Ef = Ef0;
 
-for j = 1:4
-%En esatti
-%[En, psi] = En_esatti(autovalori, m, a, h, x);
 
+for k=1:4
 %En schrodinger
 [En, psi] = Schrodinger_1D(dx, V, autovalori, m, h, N, x);
 
-[qn, fun] = calcolo_2(Eg, kb, T, a,autovalori, m,Ef, ht, x, En ,psi);
+[qn(:,k), fun] = calcolo_2(Eg, kb, T, a,autovalori, m,Ef, ht, x, En ,psi);
 
 %Poisson
 [V] = Poisson_1d(N, dx, ni, q, e0, er, qn, psi, V);
-
-hold on
-xlabel('x/L')
-plot(x/a,qn);
-plot([0 1],[ni ni])
-
 end
 
 end 
@@ -63,17 +56,21 @@ function [V] = Poisson_1d(N, dx, ni, q, e0, er, qn, psi, V)
 [righe, colonne] = size(psi);
 
 for i = 1 : colonne
-    qx(i) = -q*(ni-qn(i))/(e0*er);
+    qx(i) = -q*(qn(i))/(e0*er);
 end
 
 N = length(V);
 A = diag( 2*ones(1,N) ) + diag( -1*ones(1,N-1), 1) ...
      + diag( -1*ones(1,N-1), -1); 
 A = (1/(dx)^2).*A;
+A(1,1)=1;
+A(N,N)=1;
 
 b = qx';
-V = A\b;
+b(1,1)=0;
+b(N,1)=0;
 
+V = A\b;
 end
 
 
