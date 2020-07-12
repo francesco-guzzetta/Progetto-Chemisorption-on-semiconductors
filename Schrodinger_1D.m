@@ -14,4 +14,4 @@ H(N,N-1)=0;
 [F,D] = eigs(H,autovalori,'smallestabs');   
 En = diag(D');                                            
 
-psi = sqrt(1/dx)*F(:,1:autovalori)';         
+psi = sqrt(1/dx)*F(:,1:autovalori)';  
