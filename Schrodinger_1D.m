@@ -2,7 +2,8 @@ function [En, psi] = Schrodinger_1D(dx, V, autovalori, m0, h, N)
 
 % Matrice H
 e = ones(N,1);
-H = -(h/2/pi/dx)^2/2/m0*spdiags([1*e -(2*e+V) 1*e],-1:1, N, N);
+c = -(h/2/pi/dx)^2/2/m0;
+H = spdiags([c*e -(c*2*e+V) c*e],-1:1, N, N);
 
 %condizione al contorno 
 H(1,1)=1;
